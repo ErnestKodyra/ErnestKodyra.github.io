@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid p-5 bg-primary text-white text-center">
+            <h1>Service reviewing app</h1>
+        </div>
+
+        <div class="text-center">
+            <button type="button" class="btn btn-primary btn-lg" onclick="location.href = 'load.html'">Submit review</button>
+        </div>
+
+        <div class="text-center">
+          <button type="button" class="btn btn-primary btn-lg" onclick="location.href = 'index.html'">Check providers</button>
+        </div>
+
+        <div class="container mt-3">
+            <div class="text-center">
+                <h2>Providers</h2>
+            </div>
+          </div>
+        
+
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+            
+            // Firestore
+            import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js'
+            import { collection, getDocs, query, where, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js'
+          
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+              apiKey: "AIzaSyAbrtDF7MTzS74CNn4eb1_VuKUNGzaymKg",
+              authDomain: "projekt-3ee09.firebaseapp.com",
+              projectId: "projekt-3ee09",
+              storageBucket: "projekt-3ee09.appspot.com",
+              messagingSenderId: "909133202167",
+              appId: "1:909133202167:web:0adfe7a95ee82bf74009f2",
+              measurementId: "G-RDTB8MZDRE"
+              };
+          
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+
+            // Initialize Cloud Firestore and get a reference to the service
+            const db = getFirestore(app);
+
+            // Read data
+            const querySnapshot = await getDocs(collection(db, "uslugodawcy"));
+
+            var i = 0
+            querySnapshot.forEach((doc) => {
+                const div = document.createElement("div");
+                div.setAttribute("id", `providers${i}`);
+                document.body.appendChild(div);
+                const name = document.createElement("h3");
+                name.innerText = doc.data()['nazwa'];
+                document.getElementById(`providers${i}`).appendChild(name);
+                const address = document.createElement("h5");
+                address.innerText = "Address: " + doc.data()['adres'];
+                document.getElementById(`providers${i}`).appendChild(address);
+                const rating = document.createElement("h5");
+                rating.innerText = "Average rating: " + doc.data()['ocena'];
+                document.getElementById(`providers${i}`).appendChild(rating);
+                const telephone = document.createElement("h5");
+                telephone.innerText = "Telephone number: " + doc.data()['telefon'];
+                document.getElementById(`providers${i}`).appendChild(telephone);
+                const owner = document.createElement("h5");
+                owner.innerText = "Owner: " + doc.data()['wlasciciel'];
+                document.getElementById(`providers${i}`).appendChild(owner);
+                const reviewButton = document.createElement("button");
+                reviewButton.innerText = "Show reviews";
+                reviewButton.setAttribute("id", i)
+                document.getElementById(`providers${i}`).appendChild(reviewButton);
+                i++
+            });
+
+            var elem = document.getElementsByTagName('button');
+            for(var i = 2; i < elem.length; i++) {
+            elem[i].addEventListener('click', showReviews)}
+
+            var j = 0
+
+            async function showReviews(){
+              var buttonPressed = event.currentTarget.id;
+              const coll = document.getElementsByTagName("h3");
+              const provider = coll[buttonPressed].innerHTML
+
+              const q = query(collection(db, "uslugodawcy"), where ("nazwa", "==", provider));
+              const querySnapshot1 = await getDocs(q);
+              const checkProvider = querySnapshot.docs[buttonPressed].id
+
+              const querySnapshot2 = await getDocs(collection(db, `uslugodawcy/${checkProvider}/recenzje`));
+
+              querySnapshot2.forEach((doc) => {
+                const div = document.createElement("div");
+                document.getElementById(`providers${buttonPressed}`).appendChild(div)
+                const title = document.createElement("h4");
+                title.innerText = doc.data()['tytul']
+                document.getElementById(`providers${buttonPressed}`).appendChild(title)
+                const login = document.createElement("h5");
+                login.innerText = "Login: " + doc.data()['login']
+                document.getElementById(`providers${buttonPressed}`).appendChild(login)
+                const score = document.createElement("h5");
+                score.innerText = "Score: " + doc.data()['ocena']
+                document.getElementById(`providers${buttonPressed}`).appendChild(score)
+                const comment = document.createElement("h5");
+                comment.innerText = "Comment: " + doc.data()['komentarz']
+                document.getElementById(`providers${buttonPressed}`).appendChild(comment)
+                j++
+              })
+          }
+        </script>
+    </body>
+</html>
